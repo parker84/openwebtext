@@ -25,18 +25,34 @@ brew install libxml2 libxslt
 ```
 ## Usage
 
+0. Setup your repo, by making a settinga.py file and defining the constants below
+
+```py
+ENGINE_PATH = 
+REDDIT_POST_TABLE = "reddit_post_info"
+```
+
 1. Get list of URLs from reddit:
+
 
 ```
 pipenv run python get_urls.py
 ```
 
-2. Download data from URLs:
+2. Filter out URLs we don't want:
 
 ```
-pipenv run python download.py
+pipenv run python filter.py
+# checking urls are valid and we can scrape them
+```
+
+3. Download data from URLs:
+
+```
+pipenv run python download.py --url_file="urls-filtered.txt"
 ```
 
 Resulting files will be deposited in `data/` with format `{domain}-{sha256 hash of url}.txt`.
 
 Enjoy!
+
