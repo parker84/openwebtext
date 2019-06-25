@@ -3,11 +3,12 @@ import psaw
 import tqdm
 import datetime
 from data.openwebtext.insert_reddit_submission_into_db import RedditToDb
-
+from settings import REDDIT_POST_TABLE
 
 
 def scrape_reddit_api_and_save(query,
-                               save_urls_path):
+                               save_urls_path,
+                               save_to_table=REDDIT_POST_TABLE):
     """loop over the results from the api query, save them to the a db
     and save the urls to a txt
     
@@ -15,6 +16,7 @@ def scrape_reddit_api_and_save(query,
         query {instace of api.search_submissions} -- where: api = psaw.PushshiftAPI()
         save_urls_path {str} -- path to save urls
     """
+    reddit_to_db = RedditToDb(save_to_table)
     with tqdm.tqdm() as pbar:
         with open(save_urls_path, 'w') as fh:
             for subm in query:
@@ -31,7 +33,6 @@ def scrape_reddit_api_and_save(query,
 
 if __name__ == "__main__":
     api = psaw.PushshiftAPI()
-    reddit_to_db = RedditToDb()
     end_time = int(datetime.datetime(2019, 6, 1).timestamp())
     # start_time = int(datetime.datetime(2000, 6, 1).timestamp())
 
