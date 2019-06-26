@@ -129,8 +129,9 @@ def should_exclude(url):
 
 
 if __name__ == '__main__':
-	url_file = 'urls.txt'
-	filtered_file = 'urls-filtered.txt'
+	from settings import URLS_SAVE_PATH, FILTERED_URLS_SAVE_PATH
+	url_file = URLS_SAVE_PATH
+	filtered_file = FILTERED_URLS_SAVE_PATH
 
 	with open(url_file) as urls, open(filtered_file, 'w') as out:
 		url_len = linecount(url_file)

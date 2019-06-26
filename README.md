@@ -25,12 +25,6 @@ brew install libxml2 libxslt
 ```
 ## Usage
 
-0. Setup your repo, by making a settinga.py file and defining the constants below
-
-```py
-ENGINE_PATH = 
-REDDIT_POST_TABLE = "reddit_post_info"
-```
 
 1. Get list of URLs from reddit:
 

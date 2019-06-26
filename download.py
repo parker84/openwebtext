@@ -17,6 +17,7 @@ import multiprocessing as mpl
 from tqdm import tqdm
 import sqlite3
 import tldextract
+from settings import FILTERED_URLS_SAVE_PATH, SCRAPED_OUTPUT_DIR
 
 # for backward compatibility
 from six.moves.urllib.request import urlopen
@@ -25,17 +26,20 @@ from utils import mkdir, chunks, extract_month, linecount
 from scrapers import bs4_scraper, newspaper_scraper, raw_scraper
 
 parser = argparse.ArgumentParser()
-parser.add_argument("url_file", type=str)
+parser.add_argument(
+    "--url_file", 
+    type=str,
+    default=FILTERED_URLS_SAVE_PATH)
 parser.add_argument(
     "--save_uncompressed",
     action="store_true",
-    default=False,
+    default=True,
     help="whether to save the raw txt files to disk",
 )
 parser.add_argument(
     "--output_dir",
     type=str,
-    default="scraped",
+    default=SCRAPED_OUTPUT_DIR,
     help="which folder in the working directory to use for output",
 )
 parser.add_argument(
