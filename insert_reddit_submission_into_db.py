@@ -30,8 +30,14 @@ class RedditToDb():
         sub_dict["datetime_retrieved"] = datetime.datetime.now()
         if add_tldr_cols:
             sub_dict.update(get_tldr_and_clean_text(submission))
-            sub_dict["len_tldr_summary"] = len(sub_dict["tldr_summary"].split(" "))
-            sub_dict["len_tldr_content"] = len(sub_dict["tldr_content"].split(" "))
+            if sub_dict["tldr_summary"] is not None:
+                sub_dict["len_tldr_summary"] = len(sub_dict["tldr_summary"].split(" "))
+            else: 
+                sub_dict["len_tldr_summary"] = 0
+            if sub_dict["tldr_content"] is not None:
+                sub_dict["len_tldr_content"] = len(sub_dict["tldr_content"].split(" "))
+            else:
+                sub_dict["len_tldr_content"] = 0
         return pd.DataFrame(
             [sub_dict]
         )

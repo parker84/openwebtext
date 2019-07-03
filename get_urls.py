@@ -3,12 +3,13 @@ import psaw
 import tqdm
 import datetime
 from data.openwebtext.insert_reddit_submission_into_db import RedditToDb
-from settings import REDDIT_POST_TABLE, URLS_SAVE_PATH, REDDIT_COMMENTS_TABLE
+from settings import REDDIT_SELF_POST_TABLE, REDDIT_NON_SELF_POST_TABLE, \
+    URLS_SAVE_PATH, REDDIT_COMMENTS_TABLE
 
 
 def scrape_reddit_api_and_save(query,
                                save_urls_path=URLS_SAVE_PATH,
-                               save_to_table=REDDIT_POST_TABLE):
+                               save_to_table=REDDIT_NON_SELF_POST_TABLE):
     """loop over the results from the api query, save them to the a db
     and save the urls to a txt
     
@@ -45,7 +46,7 @@ if __name__ == "__main__":
     # self_text_search = "' tl' & 'dr'" 3 results
     
 
-    #-------------self posts
+    #-------------self text search
     # TLDRs in self text (=> usually summarizing the reddit data)
     # self_text_search = "'tl' & 'dr'"
     # query = api.search_submissions(
@@ -62,19 +63,39 @@ if __name__ == "__main__":
     #     over_18=False)
     # 100 results
 
+
+
+
+
+
     #--------------url posts
     # TLDRS in title (=> usually summarizing the link)
+    # search = "'tl' & 'dr'"
+    # query = api.search_submissions(
+    #     q=search,
+    #     before=end_time,
+    #     # limit=100,
+    #     sort='desc',
+    #     score='>2',
+    #     is_self=False,
+    #     over_18=False)
+    # # 100 results
+    # scrape_reddit_api_and_save(query, REDDIT_NON_SELF_POST_TABLE)
+
+    #-------------self posts all search
+    # TLDRs in self text (=> usually summarizing the reddit data)
     search = "'tl' & 'dr'"
     query = api.search_submissions(
         q=search,
         before=end_time,
-        limit=100,
+        # after=start_time,
+        # limit=100,
         sort='desc',
         score='>2',
-        is_self=False,
+        is_self=True,
+        # 100 when either
         over_18=False)
-    # 100 results
-    scrape_reddit_api_and_save(query, REDDIT_POST_TABLE)
+    scrape_reddit_api_and_save(query, save_to_table=REDDIT_SELF_POST_TABLE)
 
     # #--------------comments
     # # TODO: get comments working, last error was AttributeError: 'comment' object has no attribute 'url'
