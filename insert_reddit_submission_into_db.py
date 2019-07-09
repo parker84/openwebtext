@@ -7,7 +7,9 @@ from data.tldr.make_tldr_python import get_tldr_and_clean_text
 KEYS_TO_REMOVE_FROM_REDDIT_RESULT = ["link_flair_richtext",
                                      "gildings",
                                      "preview",
-                                     "author_flair_richtext"
+                                     "author_flair_richtext",
+                                     "all_awardings",
+                                     "resized_icons"
                                      ]
 
 
