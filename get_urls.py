@@ -130,59 +130,59 @@ if __name__ == "__main__":
     #     score='=2',
     #     is_self=False)
     # print(len(list(quer           gfffgfgfgfgfgff                                                                                                                                                           nnnnnnnnnnnnnnnnnnnnnnnn                                                                                                                              ))) # 16439 not worth it
-    query = api.search_submissions(
-        q=search,
-        before=end_time,
-        # limit=100,
-        sort='desc',
-        score='>1',
-        is_self=False,
-        over_18=False)
-    print(len(list(query))) # 9257
-    scrape_reddit_api_and_save(query, REDDIT_NON_SELF_POST_TABLE)
-    query = api.search_submissions(
-        q=search,
-        before=end_time,
-        # limit=100,
-        sort='desc',
-        score='=2',
-        is_self=False,
-        over_18=False)
-    scrape_reddit_api_and_save(query, REDDIT_NON_SELF_POST_TABLE)
-    query = api.search_submissions(
-        q=search,
-        before=end_time,
-        # limit=100,
-        sort='desc',
-        score='>2',
-        is_self=False,
-        over_18=False)
-    scrape_reddit_api_and_save(query, REDDIT_NON_SELF_POST_TABLE)
+    # query = api.search_submissions(
+    #     q=search,
+    #     before=end_time,
+    #     # limit=100,
+    #     sort='desc',
+    #     score='>1',
+    #     is_self=False,
+    #     over_18=False)
+    # print(len(list(query))) # 9257
+    # scrape_reddit_api_and_save(query, REDDIT_NON_SELF_POST_TABLE)
+    # query = api.search_submissions(
+    #     q=search,
+    #     before=end_time,
+    #     # limit=100,
+    #     sort='desc',
+    #     score='=2',
+    #     is_self=False,
+    #     over_18=False)
+    # scrape_reddit_api_and_save(query, REDDIT_NON_SELF_POST_TABLE)
+    # query = api.search_submissions(
+    #     q=search,
+    #     before=end_time,
+    #     # limit=100,
+    #     sort='desc',
+    #     score='>2',
+    #     is_self=False,
+    #     over_18=False)
+    # scrape_reddit_api_and_save(query, REDDIT_NON_SELF_POST_TABLE)
 
 
-    #-------------self posts all search
-    # TLDRs in self text (=> usually summarizing the reddit data)
-    search = "'tl' & 'dr'"
-    query = api.search_submissions(
-        q=search,
-        before=end_time,
-        # after=start_time,
-        # limit=100,
-        sort='desc',
-        score='>2',
-        is_self=True,
-        # 100 when either
-        over_18=False)
-    scrape_reddit_api_and_save(query, save_to_table=REDDIT_SELF_POST_TABLE)
-    query = api.search_submissions(
-        q=search,
-        before=end_time,
-        # after=start_time,
-        # limit=100,
-        sort='desc',
-        score='=2',
-        is_self=True) # 
-    scrape_reddit_api_and_save(query, save_to_table=REDDIT_SELF_POST_TABLE)
+    # #-------------self posts all search
+    # # TLDRs in self text (=> usually summarizing the reddit data)
+    # search = "'tl' & 'dr'"
+    # query = api.search_submissions(
+    #     q=search,
+    #     before=end_time,
+    #     # after=start_time,
+    #     # limit=100,
+    #     sort='desc',
+    #     score='>2',
+    #     is_self=True,
+    #     # 100 when either
+    #     over_18=False)
+    # scrape_reddit_api_and_save(query, save_to_table=REDDIT_SELF_POST_TABLE)
+    # query = api.search_submissions(
+    #     q=search,
+    #     before=end_time,
+    #     # after=start_time,
+    #     # limit=100,
+    #     sort='desc',
+    #     score='=2',
+    #     is_self=True) # 
+    # scrape_reddit_api_and_save(query, save_to_table=REDDIT_SELF_POST_TABLE)
 
 
     # #--------------comments
@@ -214,5 +214,5 @@ if __name__ == "__main__":
         before=end_time,
         score='>2')
     # print(len(list(query)))
-    scrape_reddit_api_and_save(query, REDDIT_COMMENTS_TABLE)
+    scrape_reddit_api_and_save(query, save_to_table=REDDIT_COMMENTS_TABLE)
     
