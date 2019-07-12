@@ -30,7 +30,7 @@ brew install libxml2 libxslt
 
 
 ```
-pipenv run python get_urls.py
+pipenv run python scrape_reddit.py
 ```
 
 2. Filter out URLs we don't want:
