@@ -17,11 +17,13 @@ class RedditToDb():
 
     def __init__(self,
                  save_to_table,
-                 engine=ENGINE_PATH):
+                 engine=ENGINE_PATH,
+                 start_row=0):
         self.engine = create_engine(engine)
         self.table_name = save_to_table
         self.cols = None
         self.get_cols_currently_in_table()
+        self.row_num = start_row
 
     def insert_submission_into_db(self, submission, if_exists="append"):
         df = self.subm_to_df(submission)
@@ -31,6 +33,7 @@ class RedditToDb():
         sub_dict = submission.d_
         sub_dict = self.select_cols(sub_dict)
         sub_dict["datetime_retrieved"] = datetime.datetime.now()
+        sub_dict["ix"] = self.row_num
         if add_tldr_cols:
             sub_dict.update(get_tldr_and_clean_text(submission))
             if sub_dict["tldr_summary"] is not None:
@@ -43,6 +46,7 @@ class RedditToDb():
                     sub_dict["tldr_content"].split(" "))
             else:
                 sub_dict["len_tldr_content"] = 0
+        self.row_num += 1
         return pd.DataFrame(
             [sub_dict]
         )

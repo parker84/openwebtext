@@ -3,6 +3,9 @@
 
 from __future__ import print_function
 
+from scrapers import bs4_scraper, newspaper_scraper, raw_scraper
+from utils import mkdir, chunks, extract_month, linecount
+from six.moves.urllib.request import urlopen
 import io
 import time
 import json
@@ -17,17 +20,19 @@ import multiprocessing as mpl
 from tqdm import tqdm
 import sqlite3
 import tldextract
-from settings import FILTERED_URLS_SAVE_PATH, SCRAPED_OUTPUT_DIR
+from settings import FILTERED_URLS_SAVE_PATH, SCRAPED_OUTPUT_DIR, \
+    SCRAPED_URL_POST_TABLE_NAME, ENGINE_PATH
+from sqlalchemy import create_engine
+import pandas as pd
+
+SQL_ENGINE = create_engine(ENGINE_PATH)
 
 # for backward compatibility
-from six.moves.urllib.request import urlopen
 
-from utils import mkdir, chunks, extract_month, linecount
-from scrapers import bs4_scraper, newspaper_scraper, raw_scraper
 
 parser = argparse.ArgumentParser()
 parser.add_argument(
-    "--url_file", 
+    "--url_file",
     type=str,
     default=FILTERED_URLS_SAVE_PATH)
 parser.add_argument(
@@ -104,6 +109,12 @@ parser.add_argument(
     default=True,
     help="whether to use sqlite for storing meta. if false, json will be used instead",
 )
+parser.add_argument(
+    "--save_to_table",
+    type=str,
+    default=SCRAPED_URL_POST_TABLE_NAME,
+    help="None => dont save to a table",
+)
 args = parser.parse_args()
 
 if not args.show_warnings:
@@ -142,7 +153,8 @@ def download(
     scraper=args.scraper,
     save_uncompressed=args.save_uncompressed,
     memoize=args.scraper_memoize,
-    arch_meta=not args.sqlite_meta
+    arch_meta=not args.sqlite_meta,
+    save_to_table=args.save_to_table
 ):
 
     uid, url = url_entry
@@ -186,7 +198,11 @@ def download(
         if arch_meta:
             with open(meta_fp, "w") as out:
                 json.dump(meta, out)
-
+        if save_to_table != "None":
+            meta["text"] = text
+            meta["text_fp"] = text_fp
+            pd.DataFrame([meta]).to_sql(save_to_table,
+                                        SQL_ENGINE, if_exists="append")
     return (text, meta, fid, uid)
 
 
@@ -197,7 +213,8 @@ def archive_chunk(cid, cdata, out_dir, fmt, arch_meta):
     data_tar = op.join(out_dir, "{}_data.{}".format(cid, fmt))
     if arch_meta:
         meta_tar = op.join(out_dir, "{}_meta.{}".format(cid, fmt))
-        tar_fps, texts, exts = [data_tar, meta_tar], [texts, metas], ["txt", "json"]
+        tar_fps, texts, exts = [data_tar, meta_tar], [
+            texts, metas], ["txt", "json"]
     else:
         tar_fps, texts, exts = [data_tar], [texts], ["txt"]
 
@@ -281,7 +298,8 @@ if __name__ == "__main__":
         pool = mpl.Pool(args.n_procs)
         total = linecount(args.url_file)//args.chunk_size
         print('Total chunks: ', total)
-        chunk_iterator = tqdm(enumerate(chunks(url_entries, args.chunk_size, start_elem)), total=total)
+        chunk_iterator = tqdm(
+            enumerate(chunks(url_entries, args.chunk_size, start_elem)), total=total)
 
         # display already-downloaded chunks on progress bar
         chunk_iterator.update(start_chnk)
@@ -310,7 +328,8 @@ if __name__ == "__main__":
             else:
                 cdata = list(pool.imap(download, chunk, chunksize=1))
 
-            tqdm.write("{} / {} downloads timed out".format(len(chunk) - len(cdata), len(chunk)))
+            tqdm.write(
+                "{} / {} downloads timed out".format(len(chunk) - len(cdata), len(chunk)))
             tqdm.write("Chunk time: {} seconds".format(time.time() - t1))
 
             # write metadata to sqlite
@@ -336,16 +355,20 @@ if __name__ == "__main__":
                             meta["scraper"],
                             False
                         )
-                    cur.execute("insert or ignore into metadata (fid, url, domain, elapsed, word_count, scraper, success) values (?, ?, ?, ?, ?, ?, ?)", params)
+                    cur.execute(
+                        "insert or ignore into metadata (fid, url, domain, elapsed, word_count, scraper, success) values (?, ?, ?, ?, ?, ?, ?)", params)
                 conn.commit()
 
             # archive and save this chunk to file
             if args.compress:
                 tqdm.write("Compressing...")
                 t2 = time.time()
-                count = archive_chunk(cid, cdata, args.output_dir, args.compress_fmt, not args.sqlite_meta)
-                tqdm.write("Archive created in {} seconds".format(time.time() - t2))
-            tqdm.write("{} out of {} URLs yielded content\n".format(len(list(filter(lambda x: x and x[0], cdata))), len(chunk)))
+                count = archive_chunk(
+                    cid, cdata, args.output_dir, args.compress_fmt, not args.sqlite_meta)
+                tqdm.write("Archive created in {} seconds".format(
+                    time.time() - t2))
+            tqdm.write("{} out of {} URLs yielded content\n".format(
+                len(list(filter(lambda x: x and x[0], cdata))), len(chunk)))
 
             save_state(args.url_file, cid * args.chunk_size)
 
