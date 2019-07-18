@@ -21,7 +21,7 @@ def scrape_reddit_api_and_save_urls(query,
     with tqdm.tqdm() as pbar:
         with open(save_urls_path, 'a') as fh:
             for subm in query:
-                # reddit_to_db.insert_submission_into_db(subm)
+                reddit_to_db.insert_submission_into_db(subm)
                 pbar.update(1)
                 if "url" in subm.d_:
                     url = subm.url
